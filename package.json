@@ -1,0 +1,33 @@
+{
+  "name": "monoli",
+  "version": "1.0.0",
+  "description": "Motion Notification Listener",
+  "main": "app.ts",
+  "scripts": {
+    "start": "node dist/app.js",
+    "copy_config": "node copyConfig.js",
+    "compile": "npm run delete_dist && tsc || true && node copyConfig.js",
+    "delete_dist": "rm -rf dist",
+    "test": "jest"
+  },
+  "keywords": [
+    "motion",
+    "cam",
+    "notification",
+    "listener",
+    "api"
+  ],
+  "author": "Janos Murvai-Gaal",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^22.0.1",
+    "@types/jest-matchers": "^20.0.1",
+    "@types/node": "^9.3.0",
+    "jest": "^22.1.4",
+    "shelljs": "^0.8.1",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "koa": "^2.4.1"
+  }
+}
