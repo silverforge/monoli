@@ -22,12 +22,15 @@
   "devDependencies": {
     "@types/jest": "^22.0.1",
     "@types/jest-matchers": "^20.0.1",
+    "@types/koa": "^2.0.43",
+    "@types/koa-router": "^7.0.27",
     "@types/node": "^9.3.0",
     "jest": "^22.1.4",
     "shelljs": "^0.8.1",
     "typescript": "^2.6.2"
   },
   "dependencies": {
-    "koa": "^2.4.1"
+    "koa": "^2.4.1",
+    "koa-router": "^7.3.0"
   }
 }
