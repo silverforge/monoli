@@ -6,13 +6,14 @@ import server from '../dist/app';
 describe("test routes", () => {
     chai.use(chaiHttp);
 
-    it("GET /", () => {
+    it("GET /", (done) => {
         chai.request(server)
             .get('/')
             .end((err, res) => {
                 // should.not.exist(err);
                 // res.status.should.eql(200);
                 console.log(`BODY ::: ${JSON.stringify(res.body)}`);
+                done();
             });
     });
 });

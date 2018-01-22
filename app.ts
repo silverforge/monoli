@@ -2,9 +2,9 @@ import * as Koa from 'koa';
 
 export default class App {
 
-    private static _app = new Koa();
+    private _app = new Koa();
 
-    public static main() {
+    public main() {
 
         // x-response-time
         this._app.use(async (ctx, next) => {
@@ -32,4 +32,5 @@ export default class App {
     }
 }
 
-App.main();
+let app = new App();
+app.main();
