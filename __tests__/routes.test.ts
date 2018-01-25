@@ -1,19 +1,15 @@
-import * as chai from 'chai';
-import { assert, should, expect } from 'chai';
-import * as chaiHttp from 'chai-http';
-import server from '../dist/app';
+import * as server from '../dist/app';
+import * as request from 'supertest';
 
-describe("test routes", () => {
-    chai.use(chaiHttp);
+afterEach(() => {
+    server.close();
+});
 
-    it("GET /", (done) => {
-        chai.request(server)
-            .get('/')
-            .end((err, res) => {
-                // should.not.exist(err);
-                // res.status.should.eql(200);
-                console.log(`BODY ::: ${JSON.stringify(res.body)}`);
-                done();
-            });
+describe("routes: index", () => {
+    it("should respond as expected", async () => {
+        const response = await request(server).get("/");
+        expect(response.status).toEqual(200);
+        expect(response.type).toEqual("application/json");
+        expect(response.body.data).toEqual("Sending some JSON");
     });
 });
