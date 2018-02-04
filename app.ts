@@ -7,6 +7,7 @@ const app = new Koa();
 const PORT = process.env.PORT || 3000;
 
 app.use(KoaBody());
+app.proxy = true;
 
 // logger
 app.use(async (ctx, next) => {
@@ -33,7 +34,12 @@ router.get("/", async (ctx, next) => {
 });
 
 router.post("/motiondetected", async (ctx, next) => {
-    console.log(` BODY ::: ${JSON.stringify(ctx.request.body)}`);
+    // console.log(` BODY ::: ${JSON.stringify(ctx.request.body)}`);
+    console.log(`POST arrived from ${ctx.request.ip} `);
+
+    ctx.body= {
+      received: true
+    }
 });
 
 app.use(router.routes());
