@@ -1,0 +1,19 @@
+{
+    "version": "2.5.3",
+    "compilerOptions": {
+        "lib": ["es5", "es6", "dom"],
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "dist",
+        "noStrictGenericChecks": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "typeRoots": [ "node_modules/@types" ]
+    },
+    "exclude": [
+        "node_modules",
+        "__tests__"
+    ]
+}
