@@ -1,6 +1,7 @@
 import * as Koa from 'koa';
 import * as Router from 'koa-router';
 import * as KoaBody from 'koa-body';
+import * as moment from 'moment';
 
 const router = new Router();
 const app = new Koa();
@@ -34,8 +35,8 @@ router.get("/", async (ctx, next) => {
 });
 
 router.post("/motiondetected", async (ctx, next) => {
-    // console.log(` BODY ::: ${JSON.stringify(ctx.request.body)}`);
-    console.log(`POST arrived from ${ctx.request.ip} `);
+    console.log(`POST arrived from ${ctx.request.ip} at ${moment().toISOString()}`);
+    console.log(`::: BODY ::: ${JSON.stringify(ctx.request.body)}`);
 
     ctx.body= {
       received: true
