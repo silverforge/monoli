@@ -35,7 +35,7 @@ router.get("/", async (ctx, next) => {
 });
 
 router.post("/motiondetected", async (ctx, next) => {
-    console.log(`POST arrived from ${ctx.request.ip} at ${moment().toISOString()}`);
+    console.log(`POST arrived from ${ctx.request.ip} at ${moment().toISOString(true)}`);
     console.log(`::: BODY ::: ${JSON.stringify(ctx.request.body)}`);
 
     ctx.body= {
