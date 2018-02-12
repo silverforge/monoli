@@ -2,10 +2,19 @@ import * as Koa from 'koa';
 import * as Router from 'koa-router';
 import * as KoaBody from 'koa-body';
 import * as moment from 'moment';
+import fetch from "node-fetch";
+
+import * as appconfig from './config/app_config.json';
 
 const router = new Router();
 const app = new Koa();
 const PORT = process.env.PORT || 3000;
+
+const motionDetectedUrl = (<any>appconfig).baseUrl 
+                        + "/" 
+                        + (<any>appconfig).endpointPath 
+                        + "/" 
+                        + (<any>appconfig).function;
 
 app.use(KoaBody());
 app.proxy = true;
@@ -38,8 +47,13 @@ router.post("/motiondetected", async (ctx, next) => {
     console.log(`POST arrived from ${ctx.request.ip} at ${moment().toISOString(true)}`);
     console.log(`::: BODY ::: ${JSON.stringify(ctx.request.body)}`);
 
+    let response = await fetch(motionDetectedUrl, { method: "GET" });
+    let json = await response.json();
+
+    console.log(`::: RESPONSE ::: ${JSON.stringify(json)}`);
+
     ctx.body= {
-      received: true
+      received: response.ok
     }
 });
 
