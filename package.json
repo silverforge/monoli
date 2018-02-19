@@ -4,6 +4,7 @@
   "description": "Motion Notification Listener",
   "main": "app.ts",
   "scripts": {
+    "launch": "npm run compile && npm run start",
     "start": "node dist/app.js",
     "copy_config": "node copyConfig.js",
     "compile": "npm run delete_dist && tsc || true && node copyConfig.js",

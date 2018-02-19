@@ -2,65 +2,60 @@ import * as Koa from 'koa';
 import * as Router from 'koa-router';
 import * as KoaBody from 'koa-body';
 import * as moment from 'moment';
-import fetch from "node-fetch";
 
-import * as appconfig from './config/app_config.json';
+import Facade from './src/Facade';
 
-const router = new Router();
 const app = new Koa();
-const PORT = process.env.PORT || 3000;
+const router = new Router();
+const facade = new Facade();
 
-const motionDetectedUrl = (<any>appconfig).baseUrl 
-                        + "/" 
-                        + (<any>appconfig).endpointPath 
-                        + "/" 
-                        + (<any>appconfig).function;
+const PORT = process.env.PORT || 3000;
 
 app.use(KoaBody());
 app.proxy = true;
 
 // logger
-app.use(async (ctx, next) => {
-    const start = Date.now();
-    await next();
-    const ms = Date.now() - start;
-    console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
-});
-
-// x-response-time
+// header properties
 app.use(async (ctx, next) => {
     const start = Date.now();
     await next();
     const ms = Date.now() - start;
     ctx.set('X-Response-Time', `${ms}ms`);
     ctx.set('Content-Type', 'application/json; charset=utf8');
+
+    let logLine = {
+      ip: ctx.request.ip,
+      method: ctx.method,
+      url: ctx.url,
+      timeStamp: moment().toISOString(true),
+      responseTime: ms
+    }
+    console.log(`${JSON.stringify(logLine)}`);
 });
 
 router.get("/", async (ctx, next) => {
-  ctx.body = {
-    version: 'v1.0',
-    name: 'monoli'
-  };
+    ctx.body = facade.defaultService();
 });
 
 router.post("/motiondetected", async (ctx, next) => {
-    console.log(`POST arrived from ${ctx.request.ip} at ${moment().toISOString(true)}`);
-    console.log(`::: BODY ::: ${JSON.stringify(ctx.request.body)}`);
+    ctx.body = await facade.motionDetected();
+});
 
-    let response = await fetch(motionDetectedUrl, { method: "GET" });
-    let json = await response.json();
+router.post("/iamhome", async (ctx, next) => {
 
-    console.log(`::: RESPONSE ::: ${JSON.stringify(json)}`);
-
-    ctx.body= {
-      received: response.ok
-    }
 });
 
 app.use(router.routes());
 
-const server = app.listen(PORT).on("error", err => {
-  console.error(err);
-});
+const server = app.listen(PORT)
+  .on("listening", () => {
+    console.log(`MONOLI server started on ${PORT}`)
+  })
+  .on("error", err => {
+    console.error(err);
+  })
+  .on("close", () => {
+    console.log("server stopped")
+  });
 
 module.exports = server;
