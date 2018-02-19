@@ -4,6 +4,7 @@ import * as KoaBody from 'koa-body';
 import * as moment from 'moment';
 
 import Facade from './src/Facade';
+import IAmHomeParam from './src/model/IAmHomeParam';
 
 const app = new Koa();
 const router = new Router();
@@ -24,11 +25,12 @@ app.use(async (ctx, next) => {
     ctx.set('Content-Type', 'application/json; charset=utf8');
 
     let logLine = {
-      ip: ctx.request.ip,
-      method: ctx.method,
-      url: ctx.url,
-      timeStamp: moment().toISOString(true),
-      responseTime: ms
+        timeStamp: moment().toISOString(true),
+        ip: ctx.request.ip,
+        method: ctx.method,
+        url: ctx.url,
+        body: ctx.request.body,
+        responseTime: ms
     }
     console.log(`${JSON.stringify(logLine)}`);
 });
@@ -42,20 +44,29 @@ router.post("/motiondetected", async (ctx, next) => {
 });
 
 router.post("/iamhome", async (ctx, next) => {
+    console.log(`::: BODY ::: ${JSON.stringify(ctx.request.body)}`);
 
+    let body: IAmHomeParam = new IAmHomeParam();
+    if (typeof ctx.request.body === "string")
+        body = JSON.parse(ctx.request.body);
+    else
+        body = ctx.request.body;
+
+    let toggle = body.toggle;
+    ctx.body = await facade.iAmHome(toggle);
 });
 
 app.use(router.routes());
 
 const server = app.listen(PORT)
-  .on("listening", () => {
-    console.log(`MONOLI server started on ${PORT}`)
-  })
-  .on("error", err => {
-    console.error(err);
-  })
-  .on("close", () => {
-    console.log("server stopped")
-  });
+    .on("listening", () => {
+        console.log(`MONOLI server started on ${PORT}`)
+    })
+    .on("error", err => {
+        console.error(err);
+    })
+    .on("close", () => {
+        console.log("server stopped")
+    });
 
 module.exports = server;

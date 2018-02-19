@@ -1,10 +1,17 @@
 import DefaultMessage from "./model/DefaultMessage";
 import CloudAtlas from "./CloudAtlas";
 import MotionDetectedMessage from "./model/MotionDetectedMessage";
+import * as redis from 'redis';
+
+import * as appConfig from '../config/app_config.json';
+import IAmHomeMessage from "./model/IAmHomeMessage";
 
 export default class Facade {
 
+    private static I_AM_HOME: string = "I_AM_HOME";
+
     private _cloudAtlas = new CloudAtlas();
+    private _redisClient = redis.createClient((<any>appConfig).redis.port, (<any>appConfig).redis.host);
 
     defaultService(): DefaultMessage {
         return <DefaultMessage> {
@@ -13,11 +20,54 @@ export default class Facade {
         }
     }
 
-    async motionDetected(): Promise<MotionDetectedMessage> {
-        let success = await this._cloudAtlas.pingMotionDetected();
+    public async motionDetected(): Promise<MotionDetectedMessage> {
+
+        let responseMessage: boolean = false;
+        try {
+            let result = (await this._redisGetter(Facade.I_AM_HOME) == 'true');
+            if (!result)
+                responseMessage = await this._cloudAtlas.pingMotionDetected();
+        } catch (error) {
+            console.log(`::: ERROR ::: ${JSON.stringify(error)}`);
+        }
 
         return <MotionDetectedMessage> {
-            response: success
+            response: responseMessage
         };
+    }
+
+    public async iAmHome(toggle: boolean): Promise<IAmHomeMessage> {
+        try {
+            let result = await this._redisSetter(Facade.I_AM_HOME, toggle.toString());
+            console.log(`::: RESULT ::: ${JSON.stringify(result)}`);
+        } catch(error) {
+            console.log(`::: ERROR ::: ${JSON.stringify(error)}`);
+        }
+
+        return <IAmHomeMessage> {
+            set: toggle
+        };
+    }
+
+    private _redisGetter(key: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            this._redisClient.get(key, (error, result) => {
+                if (error)
+                    reject(error);
+                else
+                    resolve(result);
+            });
+        });
+    }
+
+    private _redisSetter(key: string, value: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            this._redisClient.set(key, value, (error, result) => {
+                if (error)
+                    reject(error);
+                else
+                    resolve(result);
+            });
+        });
     }
 }
