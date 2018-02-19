@@ -9,6 +9,7 @@ import IAmHomeMessage from "./model/IAmHomeMessage";
 export default class Facade {
 
     private static I_AM_HOME: string = "I_AM_HOME";
+    private static I_AM_HOME_TTL: number = 3 * 60 * 60;
 
     private _cloudAtlas = new CloudAtlas();
     private _redisClient = redis.createClient((<any>appConfig).redis.port, (<any>appConfig).redis.host);
@@ -38,7 +39,7 @@ export default class Facade {
 
     public async iAmHome(toggle: boolean): Promise<IAmHomeMessage> {
         try {
-            let result = await this._redisSetter(Facade.I_AM_HOME, toggle.toString());
+            let result = await this._redisSetterExpire(Facade.I_AM_HOME, toggle.toString(), Facade.I_AM_HOME_TTL);
             console.log(`::: RESULT ::: ${JSON.stringify(result)}`);
         } catch(error) {
             console.log(`::: ERROR ::: ${JSON.stringify(error)}`);
@@ -63,6 +64,17 @@ export default class Facade {
     private _redisSetter(key: string, value: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             this._redisClient.set(key, value, (error, result) => {
+                if (error)
+                    reject(error);
+                else
+                    resolve(result);
+            });
+        });
+    }
+
+    private _redisSetterExpire(key: string, value: string, seconds: number): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            this._redisClient.setex(key, seconds, value, (error, result) => {
                 if (error)
                     reject(error);
                 else
