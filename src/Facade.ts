@@ -5,6 +5,7 @@ import * as redis from 'redis';
 
 import * as appConfig from '../config/app_config.json';
 import IAmHomeMessage from "./model/IAmHomeMessage";
+import AmIHomeMessage from "./model/AmIHomeMessage";
 
 export default class Facade {
 
@@ -25,7 +26,7 @@ export default class Facade {
 
         let responseMessage: boolean = false;
         try {
-            let result = (await this._redisGetter(Facade.I_AM_HOME) == 'true');
+            let result = await this.amIHome();
             if (!result)
                 responseMessage = await this._cloudAtlas.pingMotionDetected();
         } catch (error) {
@@ -40,13 +41,20 @@ export default class Facade {
     public async iAmHome(toggle: boolean): Promise<IAmHomeMessage> {
         try {
             let result = await this._redisSetterExpire(Facade.I_AM_HOME, toggle.toString(), Facade.I_AM_HOME_TTL);
-            console.log(`::: RESULT ::: ${JSON.stringify(result)}`);
+            // console.log(`::: RESULT ::: ${JSON.stringify(result)}`);
         } catch(error) {
             console.log(`::: ERROR ::: ${JSON.stringify(error)}`);
         }
 
         return <IAmHomeMessage> {
             set: toggle
+        };
+    }
+
+    public async amIHome(): Promise<AmIHomeMessage> {
+        let result: boolean = (await this._redisGetter(Facade.I_AM_HOME) == 'true');
+        return <AmIHomeMessage> {
+            answer: result
         };
     }
 

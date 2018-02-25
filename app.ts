@@ -43,8 +43,12 @@ router.post("/motiondetected", async (ctx, next) => {
     ctx.body = await facade.motionDetected();
 });
 
+router.get('/iamhome', async (ctx, next) => {
+    ctx.body = await facade.amIHome();
+});
+
 router.post("/iamhome", async (ctx, next) => {
-    console.log(`::: BODY ::: ${JSON.stringify(ctx.request.body)}`);
+    // console.log(`::: BODY ::: ${JSON.stringify(ctx.request.body)}`);
 
     let body: IAmHomeParam = new IAmHomeParam();
     if (typeof ctx.request.body === "string")
