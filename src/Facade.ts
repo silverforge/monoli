@@ -26,8 +26,8 @@ export default class Facade {
 
         let responseMessage: boolean = false;
         try {
-            let result = await this.amIHome();
-            if (!result)
+            let result: AmIHomeMessage = await this.amIHome();
+            if (!result.answer)
                 responseMessage = await this._cloudAtlas.pingMotionDetected();
         } catch (error) {
             console.log(`::: ERROR ::: ${JSON.stringify(error)}`);
